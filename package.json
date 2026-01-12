@@ -13,7 +13,7 @@
     "test": "vitest --silent=passed-only",
     "test:run": "vitest run --silent=passed-only",
     "typecheck": "tsc --noEmit",
-    "prepare": "husky install",
+    "prepare": "husky",
     "prepublishOnly": "bun run build && bun run test:run",
     "lint-staged": "lint-staged"
   },
