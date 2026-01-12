@@ -5,6 +5,7 @@
     "": {
       "name": "hono-sanitizer",
       "dependencies": {
+        "dompurify": "^3.3.1",
         "isomorphic-dompurify": "^2.35.0",
         "lint-staged": "^16.2.7",
         "oxlint-tsgolint": "^0.11.0",
