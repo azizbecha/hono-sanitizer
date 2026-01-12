@@ -1,0 +1,40 @@
+{
+  "name": "hono-sanitizer",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsdown src/index.ts --format cjs,esm --dts",
+    "dev": "tsdown src/index.ts --format cjs,esm --dts --watch",
+    "fmt": "oxfmt -c .config/.oxfmtrc.json",
+    "lint": "oxlint -c .config/.oxlintrc.json --type-aware --type-check --deny-warnings",
+    "test": "vitest --silent=passed-only",
+    "test:run": "vitest run --silent=passed-only",
+    "typecheck": "tsc --noEmit",
+    "prepare": "husky install",
+    "prepublishOnly": "bun run build && bun run test:run",
+    "lint-staged": "lint-staged"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "oxfmt": "^0.24.0",
+    "oxlint": "^1.39.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "oxlint -c .config/.oxlintrc.json --fix",
+      "oxfmt -c .config/.oxfmtrc.json --write"
+    ]
+  },
+  "dependencies": {
+    "isomorphic-dompurify": "^2.35.0",
+    "lint-staged": "^16.2.7",
+    "oxlint-tsgolint": "^0.11.0",
+    "tsdown": "^0.20.0-beta.1",
+    "vitest": "^4.0.17"
+  }
+}
