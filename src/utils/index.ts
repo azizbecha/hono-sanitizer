@@ -1,12 +1,10 @@
-import { createDOMPurify } from "isomorphic-dompurify";
+import DOMPurify from "isomorphic-dompurify";
 import type {
 	DOMPurifyConfig,
 	FieldConfig,
 	SanitizationContext,
 	SanitizationMode,
 } from "../types";
-
-const DOMPurify = createDOMPurify();
 
 /**
  * Check if a value is a plain object
@@ -261,13 +259,12 @@ export function sanitizeValue(
  */
 export async function sanitizeTarget(
 	target: Record<string, unknown>,
-	targetName: string,
 	options: SanitizationContext["options"],
 ): Promise<Record<string, unknown>> {
 	const ctx: SanitizationContext = {
 		options,
 		currentDepth: 0,
-		path: [targetName],
+		path: [],
 	};
 
 	const sanitized: Record<string, unknown> = {};

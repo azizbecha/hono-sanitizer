@@ -1,0 +1,24 @@
+# Source files
+src/
+tests/
+*.test.ts
+
+# Config files
+.github/
+.config/
+tsconfig.json
+vitest.config.ts
+.eslintrc*
+.prettierrc*
+.oxlintrc*
+.oxfmtrc*
+
+# Development files
+*.log
+.DS_Store
+.env*
+coverage/
+node_modules/
+
+# Only publish dist folder
+!dist/

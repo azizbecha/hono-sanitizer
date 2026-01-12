@@ -15,8 +15,10 @@ import type {
 	SanitizationMode,
 	ArrayStrategy,
 	FieldConfig,
-} from " ./types";
-
+} from "./types";
+import { DEFAULT_OPTIONS } from "./constants";
+import { isPlainObject, sanitizeTarget } from "./utils";
+import type { SanitizationContext } from "./types";
 /**
  * Preset configurations for common use cases
  */
@@ -128,29 +130,27 @@ export function sanitizer(options: SanitizerOptions = {}): MiddlewareHandler {
 				const contentType = c.req.header("content-type") || "";
 
 				if (contentType.includes("application/json")) {
+					let body: unknown;
 					try {
-						const body = await c.req.json();
-						if (isPlainObject(body)) {
-							const sanitized = await sanitizeTarget(
-								body,
-								"body",
-								mergedOptions,
-							);
-							// Override the parsed body
-							c.req.raw.clone = () => {
-								const init = {
-									method: c.req.method,
-									headers: c.req.raw.headers,
-									body: JSON.stringify(sanitized),
-								};
-								return new Request(c.req.url, init);
-							};
-							// Store sanitized body for retrieval
-							c.req.__sanitizedBody = sanitized;
-						}
+						body = await c.req.json();
 					} catch (error) {
 						// Not JSON or already consumed, skip
 						console.error(error);
+					}
+
+					if (isPlainObject(body)) {
+						const sanitized = await sanitizeTarget(body, mergedOptions);
+						// Override the parsed body
+						c.req.raw.clone = () => {
+							const init = {
+								method: c.req.method,
+								headers: c.req.raw.headers,
+								body: JSON.stringify(sanitized),
+							};
+							return new Request(c.req.url, init);
+						};
+						// Store sanitized body for retrieval
+						c.req.__sanitizedBody = sanitized;
 					}
 				}
 			}
@@ -161,7 +161,6 @@ export function sanitizer(options: SanitizerOptions = {}): MiddlewareHandler {
 				if (Object.keys(query).length > 0) {
 					const sanitized = await sanitizeTarget(
 						query as Record<string, unknown>,
-						"query",
 						mergedOptions,
 					);
 					c.req.__sanitizedQuery = sanitized;
@@ -174,7 +173,6 @@ export function sanitizer(options: SanitizerOptions = {}): MiddlewareHandler {
 				if (Object.keys(params).length > 0) {
 					const sanitized = await sanitizeTarget(
 						params as Record<string, unknown>,
-						"params",
 						mergedOptions,
 					);
 					c.req.__sanitizedParams = sanitized;
@@ -188,11 +186,7 @@ export function sanitizer(options: SanitizerOptions = {}): MiddlewareHandler {
 					headers[key] = value;
 				});
 				if (Object.keys(headers).length > 0) {
-					const sanitized = await sanitizeTarget(
-						headers,
-						"headers",
-						mergedOptions,
-					);
+					const sanitized = await sanitizeTarget(headers, mergedOptions);
 					c.req.__sanitizedHeaders = sanitized;
 				}
 			}
