@@ -1,9 +1,10 @@
 {
   "name": "hono-sanitizer",
+  "version": "0.0.1-beta",
+  "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "type": "module",
   "scripts": {
     "build": "tsdown src/index.ts --format cjs,esm --dts",
     "dev": "tsdown src/index.ts --format cjs,esm --dts --watch",
@@ -15,6 +16,14 @@
     "prepare": "husky install",
     "prepublishOnly": "bun run build && bun run test:run",
     "lint-staged": "lint-staged"
+  },
+  "dependencies": {
+    "dompurify": "^3.3.1",
+    "isomorphic-dompurify": "^2.35.0",
+    "lint-staged": "^16.2.7",
+    "oxlint-tsgolint": "^0.11.0",
+    "tsdown": "^0.20.0-beta.1",
+    "vitest": "^4.0.17"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -29,13 +38,5 @@
       "oxlint -c .config/.oxlintrc.json --fix",
       "oxfmt -c .config/.oxfmtrc.json --write"
     ]
-  },
-  "dependencies": {
-    "dompurify": "^3.3.1",
-    "isomorphic-dompurify": "^2.35.0",
-    "lint-staged": "^16.2.7",
-    "oxlint-tsgolint": "^0.11.0",
-    "tsdown": "^0.20.0-beta.1",
-    "vitest": "^4.0.17"
   }
 }
