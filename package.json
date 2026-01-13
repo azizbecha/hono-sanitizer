@@ -1,6 +1,6 @@
 {
   "name": "hono-sanitizer",
-  "version": "0.0.1-beta",
+  "version": "0.0.1-rc",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -40,15 +40,15 @@
   "peerDependencies": {
     "typescript": "^5"
   },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
-  },
   "lint-staged": {
     "src/**/*.ts": [
       "oxlint -c .config/.oxlintrc.json --fix",
       "oxfmt -c .config/.oxfmtrc.json --write"
     ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   }
 }
