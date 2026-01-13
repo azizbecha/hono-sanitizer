@@ -19,6 +19,7 @@ vitest.config.ts
 .env*
 coverage/
 node_modules/
+*.map
 
 # Only publish dist folder
 !dist/

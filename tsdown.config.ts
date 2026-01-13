@@ -1,0 +1,1 @@
+export default { treeshake: true }
