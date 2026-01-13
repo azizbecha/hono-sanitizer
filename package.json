@@ -1,6 +1,10 @@
 {
   "name": "hono-sanitizer",
   "version": "0.0.1-rc",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/azizbecha/hono-sanitizer.git"
+  },
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
