@@ -15,7 +15,8 @@
     "typecheck": "tsc --noEmit",
     "prepare": "husky",
     "prepublishOnly": "bun run build && bun run test:run",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "commit": "cz"
   },
   "dependencies": {
     "dompurify": "^3.3.1",
@@ -26,13 +27,22 @@
     "vitest": "^4.0.17"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
     "@types/bun": "latest",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
     "husky": "^9.1.7",
     "oxfmt": "^0.24.0",
     "oxlint": "^1.39.0"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   },
   "lint-staged": {
     "src/**/*.ts": [
