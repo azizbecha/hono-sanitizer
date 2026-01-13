@@ -324,7 +324,7 @@ describe("sanitizer", () => {
 
 		it("should work with richText preset", async () => {
 			const app = new Hono();
-			app.use("*", sanitizer(presets.richText));
+			app.use("*", sanitizer(presets.richText as any));
 			app.post("/test", async (c) => {
 				const body = getSanitizedBody(c);
 				return c.json(body);
