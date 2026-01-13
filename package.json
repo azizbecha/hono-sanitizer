@@ -1,6 +1,6 @@
 {
   "name": "hono-sanitizer",
-  "version": "0.0.1-beta",
+  "version": "0.0.2-beta",
   "repository": {
     "type": "git",
     "url": "https://github.com/azizbecha/hono-sanitizer.git"
