@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+
+  "rules": {
+    "correctness": "warn",
+    "suspicious": "warn",
+    "perf": "warn",
+    "nursery": "warn",
+    "style": "warn",
+    "complexity": "warn"
+  }
+}

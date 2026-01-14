@@ -35,21 +35,21 @@ pnpm add hono-sanitizer
 ## Quick Start
 
 ```typescript
-import { Hono } from 'hono'
-import { sanitizer } from 'hono-sanitizer'
+import { Hono } from "hono";
+import { sanitizer } from "hono-sanitizer";
 
-const app = new Hono()
+const app = new Hono();
 
 // Sanitize all request bodies (strips HTML by default)
-app.use('*', sanitizer())
+app.use("*", sanitizer());
 
-app.post('/message', async (c) => {
-  const { message } = await c.req.json()
+app.post("/message", async (c) => {
+  const { message } = await c.req.json();
   // message is now sanitized and safe to store
-  return c.json({ message })
-})
+  return c.json({ message });
+});
 
-export default app
+export default app;
 ```
 
 ## Usage Examples
@@ -57,10 +57,10 @@ export default app
 ### Basic Usage
 
 ```typescript
-import { sanitizer } from 'hono-sanitizer'
+import { sanitizer } from "hono-sanitizer";
 
 // Strip all HTML from request body
-app.use('*', sanitizer())
+app.use("*", sanitizer());
 
 // POST { message: '<script>alert("xss")</script>Hello' }
 // Result: { message: 'Hello' }
@@ -70,111 +70,135 @@ app.use('*', sanitizer())
 
 ```typescript
 // Sanitize body and query parameters
-app.use('*', sanitizer({
-  targets: ['body', 'query']
-}))
+app.use(
+  "*",
+  sanitizer({
+    targets: ["body", "query"],
+  }),
+);
 
 // Sanitize everything
-app.use('*', sanitizer({
-  targets: ['body', 'query', 'params', 'headers']
-}))
+app.use(
+  "*",
+  sanitizer({
+    targets: ["body", "query", "params", "headers"],
+  }),
+);
 ```
 
 ### Whitelist Specific Fields
 
 ```typescript
 // Only sanitize specific fields
-app.use('*', sanitizer({
-  whitelist: ['username', 'message', 'bio'],
-  mode: 'strict'
-}))
+app.use(
+  "*",
+  sanitizer({
+    whitelist: ["username", "message", "bio"],
+    mode: "strict",
+  }),
+);
 ```
 
 ### Blacklist (Skip) Fields
 
 ```typescript
 // Sanitize everything except richContent
-app.use('*', sanitizer({
-  blacklist: ['richContent', 'htmlBody']
-}))
+app.use(
+  "*",
+  sanitizer({
+    blacklist: ["richContent", "htmlBody"],
+  }),
+);
 ```
 
 ### Per-Field Configuration
 
 ```typescript
-app.use('*', sanitizer({
-  fields: {
-    // Strip all HTML from messages
-    'message': { mode: 'strict' },
-    
-    // Allow safe HTML in descriptions
-    'description': { 
-      mode: 'html',
-      config: {
-        ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br'],
-        ALLOWED_ATTR: ['href', 'target']
-      }
+app.use(
+  "*",
+  sanitizer({
+    fields: {
+      // Strip all HTML from messages
+      message: { mode: "strict" },
+
+      // Allow safe HTML in descriptions
+      description: {
+        mode: "html",
+        config: {
+          ALLOWED_TAGS: ["b", "i", "em", "strong", "a", "p", "br"],
+          ALLOWED_ATTR: ["href", "target"],
+        },
+      },
+
+      // Don't sanitize metadata
+      metadata: { mode: "skip" },
+
+      // Custom sanitizer
+      username: {
+        mode: "custom",
+        sanitizer: (value) => String(value).toLowerCase().trim(),
+      },
     },
-    
-    // Don't sanitize metadata
-    'metadata': { mode: 'skip' },
-    
-    // Custom sanitizer
-    'username': { 
-      mode: 'custom',
-      sanitizer: (value) => String(value).toLowerCase().trim()
-    }
-  }
-}))
+  }),
+);
 ```
 
 ### Using Presets
 
 ```typescript
-import { sanitizer, presets } from 'hono-sanitizer'
+import { sanitizer, presets } from "hono-sanitizer";
 
 // Strict mode - strip all HTML
-app.use('/api/comments/*', sanitizer(presets.strict))
+app.use("/api/comments/*", sanitizer(presets.strict));
 
 // Rich text - allow safe HTML tags
-app.use('/api/posts/*', sanitizer(presets.richText))
+app.use("/api/posts/*", sanitizer(presets.richText));
 
 // Markdown - minimal HTML
-app.use('/api/articles/*', sanitizer(presets.markdown))
+app.use("/api/articles/*", sanitizer(presets.markdown));
 ```
 
 ### Route-Specific Rules
 
 ```typescript
 // Different rules for different routes
-app.use('/api/posts/*', sanitizer({
-  fields: {
-    'title': { mode: 'strict' },
-    'content': { 
-      mode: 'html',
-      config: {
-        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2']
-      }
-    }
-  }
-}))
+app.use(
+  "/api/posts/*",
+  sanitizer({
+    fields: {
+      title: { mode: "strict" },
+      content: {
+        mode: "html",
+        config: {
+          ALLOWED_TAGS: ["p", "br", "strong", "em", "ul", "ol", "li", "h1", "h2"],
+        },
+      },
+    },
+  }),
+);
 
-app.use('/api/comments/*', sanitizer({
-  mode: 'strict' // No HTML in comments
-}))
+app.use(
+  "/api/comments/*",
+  sanitizer({
+    mode: "strict", // No HTML in comments
+  }),
+);
 ```
 
 ### Deep Object Sanitization
 
 ```typescript
-app.use('*', sanitizer({
-  deep: true,
-  maxDepth: 5,
-  fields: {
-    'user.bio': { mode: 'html' },
-    'user.email': { mode: 'strict' }
-  }
-}))
+app.use(
+  "*",
+  sanitizer({
+    deep: true,
+    maxDepth: 5,
+    fields: {
+      "user.bio": { mode: "html" },
+      "user.email": { mode: "strict" },
+    },
+  }),
+);
 
 // POST { user: { bio: '<p>Hello</p>', email: 'test@example.com' } }
 // Both nested fields are sanitized according to their rules
@@ -183,9 +207,12 @@ app.use('*', sanitizer({
 ### Array Handling
 
 ```typescript
-app.use('*', sanitizer({
-  arrays: 'each' // Sanitize each array element (default)
-}))
+app.use(
+  "*",
+  sanitizer({
+    arrays: "each", // Sanitize each array element (default)
+  }),
+);
 
 // Other options:
 // arrays: 'skip'  - Don't sanitize arrays
@@ -195,38 +222,41 @@ app.use('*', sanitizer({
 ### With Callbacks
 
 ```typescript
-app.use('*', sanitizer({
-  onSanitize: (field, original, sanitized) => {
-    if (original !== sanitized) {
-      console.log(`Sanitized ${field}:`, { original, sanitized })
-    }
-  },
-  onSkip: (field, value) => {
-    console.log(`Skipped ${field}`)
-  },
-  onError: (error, field) => {
-    console.error(`Error sanitizing ${field}:`, error)
-  }
-}))
+app.use(
+  "*",
+  sanitizer({
+    onSanitize: (field, original, sanitized) => {
+      if (original !== sanitized) {
+        console.log(`Sanitized ${field}:`, { original, sanitized });
+      }
+    },
+    onSkip: (field, value) => {
+      console.log(`Skipped ${field}`);
+    },
+    onError: (error, field) => {
+      console.error(`Error sanitizing ${field}:`, error);
+    },
+  }),
+);
 ```
 
 ### Accessing Sanitized Data
 
 ```typescript
-import { sanitizer, getSanitizedBody, getSanitizedQuery } from 'hono-sanitizer'
+import { sanitizer, getSanitizedBody, getSanitizedQuery } from "hono-sanitizer";
 
-app.use('*', sanitizer())
+app.use("*", sanitizer());
 
-app.post('/message', async (c) => {
+app.post("/message", async (c) => {
   // Method 1: Use helper functions
-  const body = getSanitizedBody(c)
-  const query = getSanitizedQuery(c)
-  
+  const body = getSanitizedBody(c);
+  const query = getSanitizedQuery(c);
+
   // Method 2: Regular request methods (data is already sanitized)
-  const data = await c.req.json()
-  
-  return c.json({ body, query })
-})
+  const data = await c.req.json();
+
+  return c.json({ body, query });
+});
 ```
 
 ## API Reference
@@ -240,44 +270,44 @@ Creates a Hono middleware that sanitizes request data.
 ```typescript
 type SanitizerOptions = {
   /** Which parts of the request to sanitize. Default: ['body'] */
-  targets?: ('body' | 'query' | 'params' | 'headers')[]
-  
+  targets?: ("body" | "query" | "params" | "headers")[];
+
   /** Default sanitization mode. Default: 'strict' */
-  mode?: 'strict' | 'html' | 'skip' | 'custom'
-  
+  mode?: "strict" | "html" | "skip" | "custom";
+
   /** Only sanitize these fields */
-  whitelist?: string[]
-  
+  whitelist?: string[];
+
   /** Sanitize all except these fields */
-  blacklist?: string[]
-  
+  blacklist?: string[];
+
   /** Per-field configuration */
-  fields?: Record<string, FieldConfig>
-  
+  fields?: Record<string, FieldConfig>;
+
   /** Enable deep object sanitization. Default: true */
-  deep?: boolean
-  
+  deep?: boolean;
+
   /** Maximum recursion depth. Default: 10 */
-  maxDepth?: number
-  
+  maxDepth?: number;
+
   /** Array handling strategy. Default: 'each' */
-  arrays?: 'skip' | 'each' | 'join'
-  
+  arrays?: "skip" | "each" | "join";
+
   /** DOMPurify config for 'html' mode */
-  config?: DOMPurifyConfig
-  
+  config?: DOMPurifyConfig;
+
   /** Callback after sanitization */
-  onSanitize?: (field: string, original: unknown, sanitized: unknown) => void
-  
+  onSanitize?: (field: string, original: unknown, sanitized: unknown) => void;
+
   /** Callback when field is skipped */
-  onSkip?: (field: string, value: unknown) => void
-  
+  onSkip?: (field: string, value: unknown) => void;
+
   /** Callback on error */
-  onError?: (error: Error, field: string) => void
-  
+  onError?: (error: Error, field: string) => void;
+
   /** Throw errors instead of logging. Default: false */
-  throwOnError?: boolean
-}
+  throwOnError?: boolean;
+};
 ```
 
 #### FieldConfig
@@ -285,14 +315,14 @@ type SanitizerOptions = {
 ```typescript
 type FieldConfig = {
   /** Sanitization mode for this field */
-  mode: 'strict' | 'html' | 'skip' | 'custom'
-  
+  mode: "strict" | "html" | "skip" | "custom";
+
   /** DOMPurify config (when mode is 'html') */
-  config?: DOMPurifyConfig
-  
+  config?: DOMPurifyConfig;
+
   /** Custom sanitizer function (when mode is 'custom') */
-  sanitizer?: (value: unknown) => unknown
-}
+  sanitizer?: (value: unknown) => unknown;
+};
 ```
 
 ### Sanitization Modes
@@ -315,12 +345,12 @@ getSanitizedHeaders<T>(c: Context): T | null
 ### Presets
 
 ```typescript
-import { presets } from 'hono-sanitizer'
+import { presets } from "hono-sanitizer";
 
-presets.strict      // Strip all HTML from body, query, params
-presets.richText    // Allow common HTML tags (blog posts)
-presets.markdown    // Allow minimal HTML (markdown content)
-presets.comments    // Very strict (user comments)
+presets.strict; // Strip all HTML from body, query, params
+presets.richText; // Allow common HTML tags (blog posts)
+presets.markdown; // Allow minimal HTML (markdown content)
+presets.comments; // Very strict (user comments)
 ```
 
 ## Configuration Examples
@@ -329,63 +359,87 @@ presets.comments    // Very strict (user comments)
 
 ```typescript
 // Posts - allow rich formatting
-app.use('/api/posts/*', sanitizer({
-  fields: {
-    'title': { mode: 'strict' },
-    'content': {
-      mode: 'html',
-      config: {
-        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 
-                       'ul', 'ol', 'li', 'a', 'blockquote', 'code', 'pre'],
-        ALLOWED_ATTR: ['href', 'target', 'rel']
-      }
+app.use(
+  "/api/posts/*",
+  sanitizer({
+    fields: {
+      title: { mode: "strict" },
+      content: {
+        mode: "html",
+        config: {
+          ALLOWED_TAGS: [
+            "p",
+            "br",
+            "strong",
+            "em",
+            "u",
+            "h1",
+            "h2",
+            "h3",
+            "ul",
+            "ol",
+            "li",
+            "a",
+            "blockquote",
+            "code",
+            "pre",
+          ],
+          ALLOWED_ATTR: ["href", "target", "rel"],
+        },
+      },
+      excerpt: { mode: "strict" },
+      tags: { mode: "strict" },
     },
-    'excerpt': { mode: 'strict' },
-    'tags': { mode: 'strict' }
-  }
-}))
+  }),
+);
 
 // Comments - no HTML allowed
-app.use('/api/comments/*', sanitizer(presets.strict))
+app.use("/api/comments/*", sanitizer(presets.strict));
 ```
 
 ### User Registration
 
 ```typescript
-app.use('/api/auth/register', sanitizer({
-  fields: {
-    'username': {
-      mode: 'custom',
-      sanitizer: (value) => String(value).toLowerCase().trim().slice(0, 50)
+app.use(
+  "/api/auth/register",
+  sanitizer({
+    fields: {
+      username: {
+        mode: "custom",
+        sanitizer: (value) => String(value).toLowerCase().trim().slice(0, 50),
+      },
+      email: {
+        mode: "custom",
+        sanitizer: (value) => String(value).toLowerCase().trim(),
+      },
+      password: { mode: "skip" }, // Don't sanitize passwords
+      bio: { mode: "strict" },
     },
-    'email': {
-      mode: 'custom',
-      sanitizer: (value) => String(value).toLowerCase().trim()
-    },
-    'password': { mode: 'skip' }, // Don't sanitize passwords
-    'bio': { mode: 'strict' }
-  }
-}))
+  }),
+);
 ```
 
 ### E-commerce Product
 
 ```typescript
-app.use('/api/products/*', sanitizer({
-  fields: {
-    'name': { mode: 'strict' },
-    'description': {
-      mode: 'html',
-      config: {
-        ALLOWED_TAGS: ['p', 'br', 'ul', 'ol', 'li', 'strong', 'em'],
-        ALLOWED_ATTR: []
-      }
+app.use(
+  "/api/products/*",
+  sanitizer({
+    fields: {
+      name: { mode: "strict" },
+      description: {
+        mode: "html",
+        config: {
+          ALLOWED_TAGS: ["p", "br", "ul", "ol", "li", "strong", "em"],
+          ALLOWED_ATTR: [],
+        },
+      },
+      price: { mode: "skip" }, // Number, not string
+      tags: { mode: "strict" },
+      metadata: { mode: "skip" }, // JSON data
     },
-    'price': { mode: 'skip' }, // Number, not string
-    'tags': { mode: 'strict' },
-    'metadata': { mode: 'skip' } // JSON data
-  }
-}))
+  }),
+);
 ```
 
 ## Security Best Practices
@@ -401,48 +455,51 @@ app.use('/api/products/*', sanitizer({
 ### Example: Complete Security Setup
 
 ```typescript
-import { Hono } from 'hono'
-import { sanitizer } from 'hono-sanitizer'
-import { z } from 'zod'
+import { Hono } from "hono";
+import { sanitizer } from "hono-sanitizer";
+import { z } from "zod";
 
-const app = new Hono()
+const app = new Hono();
 
 // 1. Sanitize input
-app.use('*', sanitizer({
-  mode: 'strict',
-  onSanitize: (field, original, sanitized) => {
-    if (original !== sanitized) {
-      console.warn(`[Security] Sanitized ${field}`)
-    }
-  }
-}))
+app.use(
+  "*",
+  sanitizer({
+    mode: "strict",
+    onSanitize: (field, original, sanitized) => {
+      if (original !== sanitized) {
+        console.warn(`[Security] Sanitized ${field}`);
+      }
+    },
+  }),
+);
 
 // 2. Validate with schema
 const messageSchema = z.object({
   message: z.string().min(1).max(1000),
-  username: z.string().min(3).max(50)
-})
+  username: z.string().min(3).max(50),
+});
 
-app.post('/message', async (c) => {
-  const body = await c.req.json()
-  
+app.post("/message", async (c) => {
+  const body = await c.req.json();
+
   // Validate
-  const result = messageSchema.safeParse(body)
+  const result = messageSchema.safeParse(body);
   if (!result.success) {
-    return c.json({ error: 'Invalid data' }, 400)
+    return c.json({ error: "Invalid data" }, 400);
   }
-  
-  const { message, username } = result.data
-  
+
+  const { message, username } = result.data;
+
   // 3. Use parameterized queries (example with Drizzle)
   await db.insert(messages).values({
     message,
     username,
-    createdAt: new Date()
-  })
-  
-  return c.json({ success: true })
-})
+    createdAt: new Date(),
+  });
+
+  return c.json({ success: true });
+});
 ```
 
 ## Performance Considerations
@@ -456,14 +513,17 @@ app.post('/message', async (c) => {
 ## Error Handling
 
 ```typescript
-app.use('*', sanitizer({
-  throwOnError: false, // Default: log errors without throwing
-  onError: (error, field) => {
-    // Log to monitoring service
-    console.error(`Sanitization error in ${field}:`, error)
-    // Send to error tracking (Sentry, etc.)
-  }
-}))
+app.use(
+  "*",
+  sanitizer({
+    throwOnError: false, // Default: log errors without throwing
+    onError: (error, field) => {
+      // Log to monitoring service
+      console.error(`Sanitization error in ${field}:`, error);
+      // Send to error tracking (Sentry, etc.)
+    },
+  }),
+);
 ```
 
 ## TypeScript Support
@@ -471,17 +531,17 @@ app.use('*', sanitizer({
 Full TypeScript support with type inference:
 
 ```typescript
-import type { SanitizerOptions, FieldConfig } from 'hono-sanitizer'
+import type { SanitizerOptions, FieldConfig } from "hono-sanitizer";
 
 const config: SanitizerOptions = {
-  targets: ['body', 'query'],
-  mode: 'strict',
+  targets: ["body", "query"],
+  mode: "strict",
   fields: {
-    'username': { mode: 'custom', sanitizer: (v) => String(v).toLowerCase() }
-  }
-}
+    username: { mode: "custom", sanitizer: (v) => String(v).toLowerCase() },
+  },
+};
 
-app.use('*', sanitizer(config))
+app.use("*", sanitizer(config));
 ```
 
 ## Contributing

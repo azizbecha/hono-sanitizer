@@ -8,8 +8,8 @@
     "*.css": "tailwindcss"
   },
   "oxc.typeAware": true,
-  "oxc.configPath": ".config/.oxlintrc.json",
-  "oxc.fmt.configPath": ".config/.oxfmtrc.json",
+  "oxc.configPath": ".oxlintrc.json",
+  "oxc.fmt.configPath": ".oxfmtrc.json",
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.experimental.useTsgo": true,
   "typescript.enablePromptUseWorkspaceTsdk": true
